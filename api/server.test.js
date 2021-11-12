@@ -80,3 +80,24 @@ describe("[POST] to /api/auth/login", () => {
     expect(res.body.message).toBe("username and password required");
   });
 });
+
+describe("authorization", () => {
+  const credentials = { username: "phillip", password: "1234" };
+  beforeEach(async () => {
+    await request(server).post("/api/auth/register").send(credentials);
+  });
+  test("fails, status 401 without auth 'token required'", async () => {
+    const res = await request(server).get("/api/jokes");
+    expect(res.status).toBe(401);
+    expect(res.body.message).toBe("token required");
+  });
+  test("succeeds, status 200 with auth", async () => {
+    const login = await request(server)
+      .post("/api/auth/login")
+      .send(credentials);
+    const res = await request(server)
+      .get("/api/jokes")
+      .set("Authorization", login.body.token);
+    expect(res.status).toBe(200);
+  });
+});
