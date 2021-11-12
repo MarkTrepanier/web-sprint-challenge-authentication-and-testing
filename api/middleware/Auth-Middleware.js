@@ -1,4 +1,5 @@
 const User = require("../auth/auth-model");
+const bcrypt = require("bcryptjs");
 
 async function CheckUsernameTaken(req, res, next) {
   const { username } = req.body;
@@ -17,7 +18,26 @@ function ValidateBody(req, res, next) {
   next();
 }
 
+async function ValidateUser(req, res, next) {
+  const { username } = req.body;
+  const [user] = await User.findBy({ username });
+  if (!user) {
+    next({ status: 401, message: "Invalid Credentials" });
+  }
+  req.user = user;
+  next();
+}
+
+async function ValidatePassword(req, res, next) {
+  if (bcrypt.compareSync(req.body.password, req.user.password)) {
+    next();
+  }
+  next({ status: 401, message: "Invalid Credentials" });
+}
+
 module.exports = {
   CheckUsernameTaken,
   ValidateBody,
+  ValidateUser,
+  ValidatePassword,
 };

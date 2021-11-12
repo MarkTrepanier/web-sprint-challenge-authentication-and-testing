@@ -5,6 +5,8 @@ const tokenBuilder = require("./tokenBuilder");
 const {
   CheckUsernameTaken,
   ValidateBody,
+  ValidateUser,
+  ValidatePassword,
 } = require("../middleware/Auth-Middleware");
 
 router.post("/register", ValidateBody, CheckUsernameTaken, (req, res, next) => {
@@ -18,36 +20,17 @@ router.post("/register", ValidateBody, CheckUsernameTaken, (req, res, next) => {
       res.status(201).json(resp);
     })
     .catch((err) => next(err));
-  /*
-    IMPLEMENT
-    You are welcome to build additional middlewares to help with the endpoint's functionality.
-    DO NOT EXCEED 2^8 ROUNDS OF HASHING!
-
-    1- In order to register a new account the client must provide `username` and `password`:
-      {
-        "username": "Captain Marvel", // must not exist already in the `users` table
-        "password": "foobar"          // needs to be hashed before it's saved
-      }
-
-    2- On SUCCESSFUL registration,
-      the response body should have `id`, `username` and `password`:
-      {
-        "id": 1,
-        "username": "Captain Marvel",
-        "password": "2a$08$jG.wIGR2S4hxuyWNcBf9MuoC4y0dNy7qC/LbmtuFBSdIhWks2LhpG"
-      }
-
-    3- On FAILED registration due to `username` or `password` missing from the request body,
-      the response body should include a string exactly as follows: "username and password required".
-
-    4- On FAILED registration due to the `username` being taken,
-      the response body should include a string exactly as follows: "username taken".
-  */
 });
 
-router.post("/login", (req, res) => {
-  res.end("implement login, please!");
-  /*
+router.post(
+  "/login",
+  ValidateBody,
+  ValidateUser,
+  ValidatePassword,
+  (req, res, next) => {
+    const token = tokenBuilder(req.user);
+    res.status(200).json({ message: `welcome ${req.user.username}`, token });
+    /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
 
@@ -70,6 +53,7 @@ router.post("/login", (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
+  }
+);
 
 module.exports = router;
