@@ -44,8 +44,39 @@ describe("[POST] to /api/auth/register", () => {
 });
 
 describe("[POST] to /api/auth/login", () => {
-  test.todo("res.status, 200");
-  test.todo("success, provides message and token");
-  test.todo("fail message for user not existing");
-  test.todo("username and password required");
+  const credentials = { username: "phillip", password: "1234" };
+  beforeEach(async () => {
+    await request(server).post("/api/auth/register").send(credentials);
+  });
+
+  test("res.status, 200", async () => {
+    const res = await request(server).post("/api/auth/login").send(credentials);
+    expect(res.status).toBe(200);
+  });
+  test("success, provides message and token", async () => {
+    const res = await request(server).post("/api/auth/login").send(credentials);
+    expect(res.body.message).toBe(`welcome ${credentials.username}`);
+    expect(res.body).toHaveProperty("token");
+  });
+  test("fail message for user not existing", async () => {
+    const res = await request(server)
+      .post("api/auth/login")
+      .send({ username: "crag", password: "1234" });
+    expect(res.status).toBe(404);
+    expect(res.body.message).toBe("invalid credentials");
+  });
+  test("fail message for incorrect password", async () => {
+    const res = await request(server)
+      .post("api/auth/login")
+      .send({ username: "phillip", password: "1238" });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("invalid credentials");
+  });
+  test("username and password required", async () => {
+    const res = await request(server)
+      .post("api/auth/login")
+      .send({ username: "", password: "" });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("username and password required");
+  });
 });
