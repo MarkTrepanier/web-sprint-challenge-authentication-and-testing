@@ -9,7 +9,12 @@ async function addUser(user) {
   return findById(id);
 }
 
+function findBy(filter) {
+  return db("users").where(filter);
+}
+
 module.exports = {
   findById,
   addUser,
+  findBy,
 };

@@ -10,7 +10,7 @@ test("is testing environment", () => {
   expect(process.env.NODE_ENV).toBe("testing");
 });
 
-beforeAll(async () => {
+beforeEach(async () => {
   await db.migrate.rollback();
   await db.migrate.latest();
 });
@@ -26,11 +26,10 @@ describe("[POST] to /api/auth/register", () => {
   });
   test("returns proper body", async () => {
     const res = await request(server).post("/api/auth/register").send(reqBody);
-    expect(res.body).toMatchObject(reqBody);
+    expect(res.body).toMatchObject({ username: "phillip" });
   });
   test("fails if user already exists", async () => {
     const res = await request(server).post("/api/auth/register").send(reqBody);
-    await request(server).post("/api/auth/register").send(reqBody);
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("username taken");
   });

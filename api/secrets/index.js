@@ -1,3 +1,3 @@
 module.exports = {
-  TOKEN_SECRET: process.env.TOKEN_SECRET || "this though, shh",
+  TOKEN_SECRET: process.env.TOKEN_SECRET || "shh",
 };
