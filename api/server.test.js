@@ -10,11 +10,37 @@ test("is testing environment", () => {
   expect(process.env.NODE_ENV).toBe("testing");
 });
 
+beforeAll(async () => {
+  await db.migrate.rollback();
+  await db.migrate.latest();
+});
+afterAll(async () => {
+  await db.destroy();
+});
+
 describe("[POST] to /api/auth/register", () => {
-  test.todo("res.status, 201");
-  test.todo("returns proper body");
-  test.todo("fails if user already exists");
-  test.todo("username and password required");
+  const reqBody = { username: "phillip", password: "1234" };
+  test("responds with status 201", async () => {
+    const res = await request(server).post("/api/auth/register").send(reqBody);
+    expect(res.status).toBe(201);
+  });
+  test("returns proper body", async () => {
+    const res = await request(server).post("/api/auth/register").send(reqBody);
+    expect(res.body).toMatchObject(reqBody);
+  });
+  test("fails if user already exists", async () => {
+    const res = await request(server).post("/api/auth/register").send(reqBody);
+    await request(server).post("/api/auth/register").send(reqBody);
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("username taken");
+  });
+  test("username and password required", async () => {
+    const res = await request(server)
+      .post("/api/auth/register")
+      .send({ username: "", password: "" });
+    expect(res.status).toBe(400);
+    expect(res.body.message).toBe("username and password required");
+  });
 });
 
 describe("[POST] to /api/auth/login", () => {
