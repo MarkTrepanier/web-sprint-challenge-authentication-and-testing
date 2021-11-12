@@ -22,7 +22,7 @@ async function ValidateUser(req, res, next) {
   const { username } = req.body;
   const [user] = await User.findBy({ username });
   if (!user) {
-    next({ status: 401, message: "Invalid Credentials" });
+    next({ status: 404, message: "invalid credentials" });
   }
   req.user = user;
   next();
@@ -32,7 +32,7 @@ async function ValidatePassword(req, res, next) {
   if (bcrypt.compareSync(req.body.password, req.user.password)) {
     next();
   }
-  next({ status: 401, message: "Invalid Credentials" });
+  next({ status: 400, message: "invalid credentials" });
 }
 
 module.exports = {

@@ -60,21 +60,21 @@ describe("[POST] to /api/auth/login", () => {
   });
   test("fail message for user not existing", async () => {
     const res = await request(server)
-      .post("api/auth/login")
+      .post("/api/auth/login")
       .send({ username: "crag", password: "1234" });
     expect(res.status).toBe(404);
     expect(res.body.message).toBe("invalid credentials");
   });
   test("fail message for incorrect password", async () => {
     const res = await request(server)
-      .post("api/auth/login")
+      .post("/api/auth/login")
       .send({ username: "phillip", password: "1238" });
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("invalid credentials");
   });
   test("username and password required", async () => {
     const res = await request(server)
-      .post("api/auth/login")
+      .post("/api/auth/login")
       .send({ username: "", password: "" });
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("username and password required");
