@@ -29,6 +29,7 @@ describe("[POST] to /api/auth/register", () => {
     expect(res.body).toMatchObject({ username: "phillip" });
   });
   test("fails if user already exists", async () => {
+    await request(server).post("/api/auth/register").send(reqBody);
     const res = await request(server).post("/api/auth/register").send(reqBody);
     expect(res.status).toBe(400);
     expect(res.body.message).toBe("username taken");
